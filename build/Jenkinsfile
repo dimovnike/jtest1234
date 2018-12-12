@@ -1,5 +1,5 @@
 node {
-    def app
+    def app_http
 
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
@@ -11,14 +11,14 @@ node {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
 
-        app = docker.build("dev/http")
+        app_http = docker.build("dev/http")
     }
 
     stage('Test image') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
 
-        app.inside {
+        app_http.inside {
             sh 'echo "Tests passed"'
         }
     }
@@ -29,8 +29,8 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
+            app_http.push("${env.BUILD_NUMBER}")
+            app_http.push("latest")
         }
     }
 }
