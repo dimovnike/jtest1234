@@ -13,43 +13,47 @@ node {
         ).trim()
     }
 
-    def app_http
-    stage('Build image 1') {
-        def dockerfile = './build/http/Dockerfile'
-        app_http = docker.build("dev/http", "-f ${dockerfile} .")
-    }
+    def REGISTRY='https://757692613158.dkr.ecr.eu-central-1.amazonaws.com'
+    def apps = [['http', 'http from'], ['cron', 'cron from']]
 
-    for (int i = 0; i < 5; i++) {
-        stage("Test image ${i}") {
-            app_http.inside {
-                sh 'echo "Tests passed"'
-            }
+    apps.each {
+        stage("Build image ${it[0]} / ${it[1]}") {
+            // def dockerfile = './build/http/Dockerfile'
+            // app_http = docker.build("dev/http", "-f ${dockerfile} .")
         }
     }
 
-    stage('Push image 1') {
-        docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-            app_http.push("${GIT_COMMIT_EMAIL}")
-            app_http.push("latest")
-        }
-    }
+    // for (int i = 0; i < 5; i++) {
+    //     stage("Test image ${i}") {
+    //         app_http.inside {
+    //             sh 'echo "Tests passed"'
+    //         }
+    //     }
+    // }
 
-    def app_cron
-    stage('Build image 2') {
-        def dockerfile = './build/cron/Dockerfile'
-        app_cron = docker.build("dev/cron", "-f ${dockerfile} .")
-    }
+    // stage('Push image 1') {
+    //     docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
+    //         app_http.push("${GIT_COMMIT_EMAIL}")
+    //         app_http.push("latest")
+    //     }
+    // }
 
-    stage('Test image 2') {
-        app_cron.inside {
-            sh 'echo "Tests CRON passed"'
-        }
-    }
+    // def app_cron
+    // stage('Build image 2') {
+    //     def dockerfile = './build/cron/Dockerfile'
+    //     app_cron = docker.build("dev/cron", "-f ${dockerfile} .")
+    // }
 
-    stage('Push image 2') {
-        docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-            app_cron.push("${GIT_COMMIT_EMAIL}")
-            app_cron.push("latest")
-        }
-    }
+    // stage('Test image 2') {
+    //     app_cron.inside {
+    //         sh 'echo "Tests CRON passed"'
+    //     }
+    // }
+
+    // stage('Push image 2') {
+    //     docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
+    //         app_cron.push("${GIT_COMMIT_EMAIL}")
+    //         app_cron.push("latest")
+    //     }
+    // }
 }
