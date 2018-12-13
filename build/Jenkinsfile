@@ -12,7 +12,7 @@ node {
          * docker build on the command line */
 
         def dockerfile = './build/http/Dockerfile'
-        app_http = docker.build("dev/http", ".")
+        app_http = docker.build("dev/http", "-f ${dockerfile} .")
     }
 
     stage('Test image') {
