@@ -47,7 +47,7 @@ node {
     }
 
     stage('Push image 2') {
-        docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
+        docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr-2') {
             app_cron.push("${GIT_COMMIT_EMAIL}")
             app_cron.push("latest")
         }
