@@ -1,13 +1,12 @@
 node {
-    def app_http
-
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
 
         checkout scm
     }
 
-    stage('Build image') {
+    def app_http
+    stage('Build image 1') {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
 
@@ -15,7 +14,7 @@ node {
         app_http = docker.build("dev/http", "-f ${dockerfile} .")
     }
 
-    stage('Test image') {
+    stage('Test image 1') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
 
@@ -24,7 +23,7 @@ node {
         }
     }
 
-    stage('Push image') {
+    stage('Push image 1') {
         /* Finally, we'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
@@ -32,6 +31,35 @@ node {
         docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
             app_http.push("${env.BUILD_NUMBER}")
             app_http.push("latest")
+        }
+    }
+
+    def app_cron
+    stage('Build image 2') {
+        /* This builds the actual image; synonymous to
+         * docker build on the command line */
+
+        def dockerfile = './build/cron/Dockerfile'
+        app_cron = docker.build("dev/cron", "-f ${dockerfile} .")
+    }
+
+    stage('Test image 2') {
+        /* Ideally, we would run a test framework against our image.
+         * For this example, we're using a Volkswagen-type approach ;-) */
+
+        app_cron.inside {
+            sh 'echo "Tests CRON passed"'
+        }
+    }
+
+    stage('Push image 2') {
+        /* Finally, we'll push the image with two tags:
+         * First, the incremental build number from Jenkins
+         * Second, the 'latest' tag.
+         * Pushing multiple tags is cheap, as all the layers are reused. */
+        docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
+            app_cron.push("${env.BUILD_NUMBER}")
+            app_cron.push("latest")
         }
     }
 }
