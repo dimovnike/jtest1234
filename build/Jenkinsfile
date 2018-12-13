@@ -5,7 +5,7 @@ node {
         checkout scm
 
         GIT_COMMIT_EMAIL = sh (
-            script: 'git describe --always'
+            script: 'git describe --always',
             returnStdout: true
         ).trim()
     }
