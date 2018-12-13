@@ -34,7 +34,7 @@ node {
         }
 
         stage("Push image ${it[0]}") {
-            docker.withRegistry("${REGISTRY}", 'aws-tb-60') {
+            docker.withRegistry("${REGISTRY}", 'ecr:eu-central-1:aws-tb-60') {
                 app.push("${GIT_COMMIT}")
                 app.push("latest")
             }
