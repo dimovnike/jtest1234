@@ -7,53 +7,34 @@ node {
 
         checkout scm
 
-        GIT_COMMIT_EMAIL = sh (
+        GIT_COMMIT = sh (
             script: 'git describe --always',
             returnStdout: true
         ).trim()
     }
 
     def REGISTRY='https://757692613158.dkr.ecr.eu-central-1.amazonaws.com'
+    def ENV='dev'
+
+    // define apps to build here, format is [app, from]
     def apps = [['http', 'http from'], ['cron', 'cron from']]
 
     apps.each {
-        stage("Build image ${it[0]} / ${it[1]}") {
-            // def dockerfile = './build/http/Dockerfile'
-            // app_http = docker.build("dev/http", "-f ${dockerfile} .")
+        stage("Build image: ${it[0]}, from: ${it[1]}") {
+            app_http = docker.build("${ENV}/${it[0]}", "-f ./build/${it[0]}/Dockerfile .")
+        }
+
+        stage("Test image ${it[0]}") {
+            app_cron.inside {
+                sh 'echo "Tests CRON passed"'
+            }
+        }
+
+        stage("Push image ${it[0]}") {
+            docker.withRegistry($REGISTRY, 'aws-ecr') {
+                app_http.push("${GIT_COMMIT}")
+                app_http.push("latest")
+            }
         }
     }
-
-    // for (int i = 0; i < 5; i++) {
-    //     stage("Test image ${i}") {
-    //         app_http.inside {
-    //             sh 'echo "Tests passed"'
-    //         }
-    //     }
-    // }
-
-    // stage('Push image 1') {
-    //     docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-    //         app_http.push("${GIT_COMMIT_EMAIL}")
-    //         app_http.push("latest")
-    //     }
-    // }
-
-    // def app_cron
-    // stage('Build image 2') {
-    //     def dockerfile = './build/cron/Dockerfile'
-    //     app_cron = docker.build("dev/cron", "-f ${dockerfile} .")
-    // }
-
-    // stage('Test image 2') {
-    //     app_cron.inside {
-    //         sh 'echo "Tests CRON passed"'
-    //     }
-    // }
-
-    // stage('Push image 2') {
-    //     docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-    //         app_cron.push("${GIT_COMMIT_EMAIL}")
-    //         app_cron.push("latest")
-    //     }
-    // }
 }
