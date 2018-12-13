@@ -25,7 +25,7 @@ node {
         
         stage("Build image: ${it[0]}, from: ${it[1]}") {
             docker.withRegistry("${env.NEWTON_REGISTRY}", 'ecr:eu-central-1:aws-tb-60') {
-                app = docker.build("${env.NEWTON_REGISTRY}/${it[0]}", "-f ./build/${it[0]}/Dockerfile .")
+                app = docker.build("${env.NEWTON_ENV}/${it[0]}", "-f ./build/${it[0]}/Dockerfile .")
             }
         }
 
