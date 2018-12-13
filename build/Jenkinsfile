@@ -20,7 +20,7 @@ node {
         def app;
         
         stage("Build image: ${it[0]}, from: ${it[1]}") {
-            docker.withRegistry("${env.PIPE_REGISTRY}", "${env.PIPE_REGISTRY}") {
+            docker.withRegistry("${env.PIPE_REGISTRY}", "${env.PIPE_CREDS}") {
                 app = docker.build("${env.PIPE_ENV}/${it[0]}", "-f ./build/${it[0]}/Dockerfile .")
             }
         }
@@ -32,7 +32,7 @@ node {
         }
 
         stage("Push image ${it[0]}") {
-            docker.withRegistry("${env.PIPE_REGISTRY}", "${env.PIPE_REGISTRY}") {
+            docker.withRegistry("${env.PIPE_REGISTRY}", "${env.PIPE_CREDS}") {
                 app.push("${GIT_COMMIT}")
                 app.push("latest")
             }
