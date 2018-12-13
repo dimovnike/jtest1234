@@ -13,19 +13,15 @@ node {
         ).trim()
     }
 
-    def REGISTRY='https://757692613158.dkr.ecr.eu-central-1.amazonaws.com'
-    def ENV='dev'
-
     // define apps to build here, format is [app, from]
     def apps = [['http', 'http from'], ['cron', 'cron from']]
-    // test
 
     apps.each {
         def app;
         
         stage("Build image: ${it[0]}, from: ${it[1]}") {
-            docker.withRegistry("${env.NEWTON_REGISTRY}", 'ecr:eu-central-1:aws-tb-60') {
-                app = docker.build("${env.NEWTON_ENV}/${it[0]}", "-f ./build/${it[0]}/Dockerfile .")
+            docker.withRegistry("${env.PIPE_REGISTRY}", "${env.PIPE_REGISTRY}") {
+                app = docker.build("${env.PIPE_ENV}/${it[0]}", "-f ./build/${it[0]}/Dockerfile .")
             }
         }
 
@@ -36,7 +32,7 @@ node {
         }
 
         stage("Push image ${it[0]}") {
-            docker.withRegistry("${env.NEWTON_REGISTRY}", 'ecr:eu-central-1:aws-tb-60') {
+            docker.withRegistry("${env.PIPE_REGISTRY}", "${env.PIPE_REGISTRY}") {
                 app.push("${GIT_COMMIT}")
                 app.push("latest")
             }
