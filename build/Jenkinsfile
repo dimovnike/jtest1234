@@ -3,6 +3,11 @@ node {
         /* Let's make sure we have the repository cloned to our workspace */
 
         checkout scm
+
+        GIT_COMMIT_EMAIL = sh (
+            script: 'git describe --always'
+            returnStdout: true
+        ).trim()
     }
 
     def app_http
@@ -29,7 +34,7 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-            app_http.push("${env.BUILD_NUMBER}")
+            app_http.push("${GIT_COMMIT_EMAIL}")
             app_http.push("latest")
         }
     }
@@ -58,7 +63,7 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         docker.withRegistry('https://757692613158.dkr.ecr.eu-central-1.amazonaws.com', 'aws-ecr') {
-            app_cron.push("${env.BUILD_NUMBER}")
+            app_cron.push("${GIT_COMMIT_EMAIL}")
             app_cron.push("latest")
         }
     }
