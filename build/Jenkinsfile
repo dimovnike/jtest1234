@@ -18,6 +18,7 @@ node {
 
     // define apps to build here, format is [app, from]
     def apps = [['http', 'http from'], ['cron', 'cron from']]
+    // test
 
     apps.each {
         def app;
