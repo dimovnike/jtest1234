@@ -31,7 +31,7 @@ node {
         }
 
         stage("Push image ${it[0]}") {
-            docker.withRegistry("$REGISTRY", 'aws-ecr') {
+            docker.withRegistry("${REGISTRY}", 'aws-ecr') {
                 app_http.push("${GIT_COMMIT}")
                 app_http.push("latest")
             }
